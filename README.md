@@ -1,2 +1,2 @@
-# quik-ide
+# notAnIDE
 Yet another code editor
