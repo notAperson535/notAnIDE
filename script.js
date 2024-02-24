@@ -6,13 +6,13 @@ let state = bundle.state
 // IMPORTANT FUNCTIONS
 function save() {
     if (currentFolderPath != "") {
-        window.quikAPI.writeFile(editor.path, editor.state.doc.toString())
+        window.API.writeFile(editor.path, editor.state.doc.toString())
     } else {
-        window.quikAPI.saveAs("", editor.state.doc.toString())
+        window.API.saveAs("", editor.state.doc.toString())
     }
 }
 
-window.quikAPI.onFolderRefresh(() => {
+window.API.onFolderRefresh(() => {
     openFolder(currentFolderPath)
 })
 
@@ -20,18 +20,18 @@ window.quikAPI.onFolderRefresh(() => {
 
 // file menu
 
-window.quikAPI.onOpenFolder((folderPath) => openFolder(folderPath))
-window.quikAPI.onNewFile(() => {
-    window.quikAPI.saveAs("", "")
+window.API.onOpenFolder((folderPath) => openFolder(folderPath))
+window.API.onNewFile(() => {
+    window.API.saveAs("", "")
 })
-window.quikAPI.onSaveFile(() => save())
-window.quikAPI.onSaveFileAs(() => {
-    window.quikAPI.saveAs(editor.fileName, editor.state.doc.toString())
+window.API.onSaveFile(() => save())
+window.API.onSaveFileAs(() => {
+    window.API.saveAs(editor.fileName, editor.state.doc.toString())
 })
 
 // edit menu
 
-window.quikAPI.onFind(() => bundle.openSearchPanel(editor))
+window.API.onFind(() => bundle.openSearchPanel(editor))
 
 // SIDEBAR
 
@@ -78,7 +78,7 @@ function openFolder(folderPath) {
     let filesDirArray = folderPath.split("/")
     let lastPart = filesDirArray[filesDirArray.length - 1]
     document.getElementById("projectName").innerHTML = lastPart
-    let filesPromise = window.quikAPI.folderContents(folderPath)
+    let filesPromise = window.API.folderContents(folderPath)
     filesPromise.then((files) => {
         files = files.sort((a, b) => {
             if (a.type === b.type) {
@@ -117,7 +117,7 @@ function openFolder(folderPath) {
                 e.stopPropagation()
                 save()
                 filePath = fileEntry.getAttribute("data-file-path")
-                fileContents = window.quikAPI.readFile(filePath)
+                fileContents = window.API.readFile(filePath)
                 fileContents.then(fileContents => {
                     editor.path = filePath
                     editor.fileName = fileEntry.querySelector("p").innerHTML
@@ -137,22 +137,16 @@ function openFolder(folderPath) {
 }
 
 async function switchLanguageMode(extension) {
-    if (extension == "quik") {
-        editor.dispatch({
-            effects: bundle.languageConf.reconfigure(await bundle.quik())
-        })
-    } else {
-        for (let language of bundle.languages) {
-            if (language.extensions.includes(extension)) {
-                editor.dispatch({
-                    effects: bundle.languageConf.reconfigure(await language.load())
-                })
-                return
-            } else {
-                editor.dispatch({
-                    effects: bundle.languageConf.reconfigure([])
-                })
-            }
+    for (let language of bundle.languages) {
+        if (language.extensions.includes(extension)) {
+            editor.dispatch({
+                effects: bundle.languageConf.reconfigure(await language.load())
+            })
+            return
+        } else {
+            editor.dispatch({
+                effects: bundle.languageConf.reconfigure([])
+            })
         }
     }
 }

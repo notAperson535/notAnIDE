@@ -1,6 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron/renderer')
 
-contextBridge.exposeInMainWorld('quikAPI', {
+contextBridge.exposeInMainWorld('API', {
     // renderer to main.js
     openFolder: () => ipcRenderer.invoke('openFolder'),
     folderContents: (folderPath) => ipcRenderer.invoke('folderContents', folderPath),
